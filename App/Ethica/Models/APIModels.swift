@@ -21,6 +21,7 @@ struct BackendResponse: Codable {
     let safetyConfidenceExplanation: SafetyConfidenceExplanation?
     let crossContaminationRisks: [CrossContaminationRisk]?
     let ingredientEducation: [IngredientEducation]?
+    let allergenMayContain: [String]?
     
     // FLAT-KEY FALLBACKS: Backend sends flatten_analysis_for_ios() with top-level keys
     // These take priority over nested structs above when present
@@ -62,12 +63,12 @@ struct BackendResponse: Codable {
         case productName, confidence, allergens, dietary, health, environmental
         case recommendations  // Tries to decode as RecommendationInfo first
         case alternatives, additives, safetyConfidenceExplanation
-        case crossContaminationRisks, ingredientEducation
+        case crossContaminationRisks, ingredientEducation, allergenMayContain
         case healthScore, environmentalScore, co2Emissions, waterUsage, animalImpact
         case isSafe, overallScore, ingredients, dietaryViolations, cautionWarnings
         case detectedAllergens, healthConcerns, healthBenefits, nutritionalHighlights
         case environmentalBreakdown, confidenceFactors, detectionEvidence
-        case gmoStatus, gmoStatusReason, highRiskIngredients, nonGmoCertified
+        case gmoStatus, gmoStatusReason, gmoRiskPercentage, highRiskIngredients, nonGmoCertified
         case violations, warnings, brand, safetyLevel, certifications, processingLevel
         case packagingScore, animalWelfareScore, sourceBarcode, sourceType
         case packageWeightGrams, landUse
@@ -99,6 +100,7 @@ struct BackendResponse: Codable {
         safetyConfidenceExplanation = try container.decodeIfPresent(SafetyConfidenceExplanation.self, forKey: .safetyConfidenceExplanation)
         crossContaminationRisks = try container.decodeIfPresent([CrossContaminationRisk].self, forKey: .crossContaminationRisks)
         ingredientEducation = try container.decodeIfPresent([IngredientEducation].self, forKey: .ingredientEducation)
+        allergenMayContain = try container.decodeIfPresent([String].self, forKey: .allergenMayContain)
         healthScore = try container.decodeIfPresent(Double.self, forKey: .healthScore)
         environmentalScore = try container.decodeIfPresent(Double.self, forKey: .environmentalScore)
         co2Emissions = try container.decodeIfPresent(Double.self, forKey: .co2Emissions)
@@ -118,6 +120,7 @@ struct BackendResponse: Codable {
         detectionEvidence = try container.decodeIfPresent([DetectionEvidence].self, forKey: .detectionEvidence)
         gmoStatus = try container.decodeIfPresent(String.self, forKey: .gmoStatus)
         gmoStatusReason = try container.decodeIfPresent(String.self, forKey: .gmoStatusReason)
+        gmoRiskPercentage = try container.decodeIfPresent(Double.self, forKey: .gmoRiskPercentage)
         highRiskIngredients = try container.decodeIfPresent([String].self, forKey: .highRiskIngredients)
         nonGmoCertified = try container.decodeIfPresent(Bool.self, forKey: .nonGmoCertified)
         violations = try container.decodeIfPresent([String].self, forKey: .violations)
@@ -137,6 +140,7 @@ struct BackendResponse: Codable {
     // GMO 4-State Status (100% accuracy guarantee)
     let gmoStatus: String?           // "confirmed_gmo" | "non_gmo_certified" | "high_risk_unknown" | "no_risk"
     let gmoStatusReason: String?      // User-facing explanation
+    let gmoRiskPercentage: Double?    // Estimated GMO percentage / risk score (0-100)
     let highRiskIngredients: [String]? // Which high-risk GMO ingredients were found
     let nonGmoCertified: Bool?        // Has Non-GMO Project / Organic certification
     

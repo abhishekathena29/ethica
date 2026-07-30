@@ -75,25 +75,55 @@ struct QuickSafetyResultView: View {
 
                     // MARK: - GMO Status
                     if let gmo = result.gmoStatus, gmo != "no_risk" {
-                        GlassCard(variant: gmo == "confirmed_gmo" ? .error : .warning) {
-                            HStack(spacing: Spacing.sm) {
-                                Image(systemName: gmo == "confirmed_gmo" ? "leaf.fill" : "questionmark.circle.fill")
-                                    .foregroundColor(gmo == "confirmed_gmo" ? Theme.error : Theme.warning)
-                                    .font(.system(size: 20))
+                        let isError = gmo == "confirmed_gmo"
+                        let riskPercent = result.gmoRiskPercentage ?? (isError ? 100.0 : (result.gmoHighRiskIngredients?.isEmpty == false ? 75.0 : 50.0))
+                        let highRiskItems = result.gmoHighRiskIngredients ?? []
 
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(gmo == "confirmed_gmo" ? "Contains GMO Ingredients" : "Potential GMO Ingredients")
-                                        .font(.system(size: 14, weight: .semibold))
-                                        .foregroundColor(Theme.textPrimary)
+                        GlassCard(variant: isError ? .error : .warning) {
+                            VStack(alignment: .leading, spacing: Spacing.xs) {
+                                HStack(spacing: Spacing.sm) {
+                                    Image(systemName: isError ? "exclamationmark.triangle.fill" : "questionmark.circle.fill")
+                                        .foregroundColor(isError ? Theme.error : Theme.warning)
+                                        .font(.system(size: 20))
 
-                                    Text(gmo == "confirmed_gmo"
-                                         ? "Product contains bioengineered food ingredients"
-                                         : "Contains high-risk GMO crops without non-GMO certification")
-                                        .font(.system(size: 12))
-                                        .foregroundColor(Theme.textTertiary)
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("GMO (Genetically Modified Organism)")
+                                            .font(.system(size: 14, weight: .bold))
+                                            .foregroundColor(Theme.textPrimary)
+
+                                        Text(isError ? "Contains GMO Ingredients" : "Potential High-Risk GMO Crops")
+                                            .font(.system(size: 12, weight: .medium))
+                                            .foregroundColor(isError ? Theme.error : Theme.warning)
+                                    }
+
+                                    Spacer()
+
+                                    Text("\(Int(riskPercent))%")
+                                        .font(.system(size: 15, weight: .bold))
+                                        .foregroundColor(isError ? Theme.error : Theme.warning)
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 4)
+                                        .background(Color.white.opacity(0.1))
+                                        .cornerRadius(6)
                                 }
 
-                                Spacer()
+                                if !highRiskItems.isEmpty {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text("High-Risk GMO Crops:")
+                                            .font(.system(size: 11, weight: .semibold))
+                                            .foregroundColor(Theme.textSecondary)
+
+                                        Text(highRiskItems.joined(separator: ", "))
+                                            .font(.system(size: 11))
+                                            .foregroundColor(Theme.textPrimary)
+                                    }
+                                    .padding(.top, 2)
+                                }
+
+                                Text("In the context of food, GMO (Genetically Modified Organism) refers to plants, animals, or microorganisms whose DNA has been altered using genetic engineering to introduce specific traits that don't occur naturally through traditional breeding.")
+                                    .font(.system(size: 11))
+                                    .foregroundColor(Theme.textTertiary)
+                                    .padding(.top, 4)
                             }
                         }
                     }

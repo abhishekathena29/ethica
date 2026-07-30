@@ -93,7 +93,7 @@ struct PrivacyPolicyView: View {
                         • Opt out of analytics tracking
                         • Export your scan history
 
-                        To exercise these rights, contact us at: support@ethica-app.com
+                        To exercise these rights, contact us at: whitehatarham@gmail.com
                         """)
                     }
 
@@ -116,7 +116,7 @@ struct PrivacyPolicyView: View {
                         sectionText("""
                         If you have questions about this Privacy Policy, please contact:
 
-                        Email: support@ethica-app.com
+                        Email: whitehatarham@gmail.com
                         Address: [Your Company Address]
                         """)
                     }

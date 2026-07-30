@@ -52,7 +52,6 @@
 		1E864B752F048AD2001A2305 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E864B742F048AD2001A2305 /* SignInView.swift */; };
 		1E9B7A102F9F1A0100ABCD01 /* WebAuthSessionPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E9B7A0F2F9F1A0100ABCD01 /* WebAuthSessionPresenter.swift */; };
 		1E9B7A122F9F1A0200ABCD01 /* AppleSignInCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E9B7A112F9F1A0200ABCD01 /* AppleSignInCoordinator.swift */; };
-		AUTHCFG001A1B2C3D4E5F60001 /* AuthConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = AUTHCFG002A1B2C3D4E5F60001 /* AuthConfig.swift */; };
 		1E9C966E2EC6C7FC004BF1D4 /* Extensions/Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E9C966D2EC6C7FC004BF1D4 /* Extensions/Color+Extensions.swift */; };
 		1E9C96702EC90F06004BF1D4 /* BlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E9C966F2EC90F06004BF1D4 /* BlurView.swift */; };
 		1E9C96732ED265F8004BF1D4 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E9C96712ED265F8004BF1D4 /* DashboardView.swift */; };
@@ -62,8 +61,9 @@
 		1EAA11112F9A000100000002 /* MissingProductSubmissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EAA11112F9A000100000001 /* MissingProductSubmissionView.swift */; };
 		1EAA11112F9A000100000004 /* ProductSubmissionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EAA11112F9A000100000003 /* ProductSubmissionService.swift */; };
 		1EAA11112F9A000100000006 /* OnDeviceOCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EAA11112F9A000100000005 /* OnDeviceOCRService.swift */; };
+		1EASSETS01F70000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1EASSETS01F70000000000002 /* Assets.xcassets */; };
+		1EBRAND012F70000000000001 /* EthicaBrandLogo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EBRAND012F70000000000002 /* EthicaBrandLogo.swift */; };
 		1EDB10012EDBAA01001A2B3C /* BarcodeScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EDB10002EDBAA01001A2B3C /* BarcodeScanner.swift */; };
-		1EVKDS012F60000000000001 /* DataScannerFallbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EVKDS002F60000000000001 /* DataScannerFallbackView.swift */; };
 		1EDB10032EDBAA02001A2B3C /* OpenFoodFactsClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EDB10022EDBAA02001A2B3C /* OpenFoodFactsClient.swift */; };
 		1EDB10052EDBAA03001A2B3C /* ProductCacheService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EDB10042EDBAA03001A2B3C /* ProductCacheService.swift */; };
 		1EDB10072EDBAA04001A2B3C /* ProductDatabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EDB10062EDBAA04001A2B3C /* ProductDatabaseService.swift */; };
@@ -102,6 +102,7 @@
 		1EFD009C2F43774500461A41 /* DisclaimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EFD00992F43774500461A41 /* DisclaimerView.swift */; };
 		1EFD009E2F43775D00461A41 /* IngredientMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EFD009D2F43775D00461A41 /* IngredientMatcher.swift */; };
 		1EFD00A02F44CE4900461A41 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EFD009F2F44CE4900461A41 /* OnboardingView.swift */; };
+		1EVKDS012F60000000000001 /* DataScannerFallbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EVKDS002F60000000000001 /* DataScannerFallbackView.swift */; };
 		208F8CB51220F7D924E598A3 /* PlateAnalysisModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41F949C2A1DD683D0170440A /* PlateAnalysisModel.swift */; };
 		AA1234560001000000000001 /* JainDietValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1234560001000000000002 /* JainDietValidator.swift */; };
 		AABB00010000000000000002 /* EthicaTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABB00010000000000000001 /* EthicaTabBar.swift */; };
@@ -110,6 +111,7 @@
 		AABB00040000000000000002 /* AmbientGradient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABB00040000000000000001 /* AmbientGradient.swift */; };
 		AABB00050000000000000002 /* BottomSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABB00050000000000000001 /* BottomSheet.swift */; };
 		AABB00060000000000000002 /* LottieView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABB00060000000000000001 /* LottieView.swift */; };
+		AUTHCFG001A1B2C3D4E5F60001 /* AuthConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = AUTHCFG002A1B2C3D4E5F60001 /* AuthConfig.swift */; };
 		DC9F175C103C2BE958AEDBA5 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 876CE6FF9C0AE304C7DE0F56 /* SQLite */; };
 		E2604009384361513636C35C /* DebugLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97AF1CF98E58B0CD06C244F /* DebugLogger.swift */; };
 		EBF94C74727BCB720173E287 /* OfflineCacheService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51795ABC15F7C559F9BFE6BB /* OfflineCacheService.swift */; };
@@ -184,7 +186,6 @@
 		1E864B742F048AD2001A2305 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
 		1E9B7A0F2F9F1A0100ABCD01 /* WebAuthSessionPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebAuthSessionPresenter.swift; sourceTree = "<group>"; };
 		1E9B7A112F9F1A0200ABCD01 /* AppleSignInCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleSignInCoordinator.swift; sourceTree = "<group>"; };
-		AUTHCFG002A1B2C3D4E5F60001 /* AuthConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthConfig.swift; sourceTree = "<group>"; };
 		1E9C966D2EC6C7FC004BF1D4 /* Extensions/Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extensions/Color+Extensions.swift"; sourceTree = "<group>"; };
 		1E9C966F2EC90F06004BF1D4 /* BlurView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurView.swift; sourceTree = "<group>"; };
 		1E9C96712ED265F8004BF1D4 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
@@ -194,8 +195,9 @@
 		1EAA11112F9A000100000001 /* MissingProductSubmissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissingProductSubmissionView.swift; sourceTree = "<group>"; };
 		1EAA11112F9A000100000003 /* ProductSubmissionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductSubmissionService.swift; sourceTree = "<group>"; };
 		1EAA11112F9A000100000005 /* OnDeviceOCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnDeviceOCRService.swift; sourceTree = "<group>"; };
+		1EASSETS01F70000000000002 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		1EBRAND012F70000000000002 /* EthicaBrandLogo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthicaBrandLogo.swift; sourceTree = "<group>"; };
 		1EDB10002EDBAA01001A2B3C /* BarcodeScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarcodeScanner.swift; sourceTree = "<group>"; };
-		1EVKDS002F60000000000001 /* DataScannerFallbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataScannerFallbackView.swift; sourceTree = "<group>"; };
 		1EDB10022EDBAA02001A2B3C /* OpenFoodFactsClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenFoodFactsClient.swift; sourceTree = "<group>"; };
 		1EDB10042EDBAA03001A2B3C /* ProductCacheService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductCacheService.swift; sourceTree = "<group>"; };
 		1EDB10062EDBAA04001A2B3C /* ProductDatabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductDatabaseService.swift; sourceTree = "<group>"; };
@@ -234,6 +236,7 @@
 		1EFD009A2F43774500461A41 /* ReportIssueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportIssueView.swift; sourceTree = "<group>"; };
 		1EFD009D2F43775D00461A41 /* IngredientMatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IngredientMatcher.swift; sourceTree = "<group>"; };
 		1EFD009F2F44CE4900461A41 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		1EVKDS002F60000000000001 /* DataScannerFallbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataScannerFallbackView.swift; sourceTree = "<group>"; };
 		41F949C2A1DD683D0170440A /* PlateAnalysisModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlateAnalysisModel.swift; sourceTree = "<group>"; };
 		51795ABC15F7C559F9BFE6BB /* OfflineCacheService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OfflineCacheService.swift; sourceTree = "<group>"; };
 		9B65535B2FE5128300948CDA /* Ethica.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Ethica.entitlements; sourceTree = "<group>"; };
@@ -244,6 +247,7 @@
 		AABB00040000000000000001 /* AmbientGradient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmbientGradient.swift; sourceTree = "<group>"; };
 		AABB00050000000000000001 /* BottomSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheet.swift; sourceTree = "<group>"; };
 		AABB00060000000000000001 /* LottieView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LottieView.swift; sourceTree = "<group>"; };
+		AUTHCFG002A1B2C3D4E5F60001 /* AuthConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthConfig.swift; sourceTree = "<group>"; };
 		B97AF1CF98E58B0CD06C244F /* DebugLogger.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DebugLogger.swift; sourceTree = "<group>"; };
 		GEMINICFG002A1B2C3D4E5F60001 /* GeminiConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiConfig.swift; sourceTree = "<group>"; };
 		GEMINISVC002A1B2C3D4E5F60002 /* GeminiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiService.swift; sourceTree = "<group>"; };
@@ -373,6 +377,7 @@
 		1E481E6B2EC401F6009F8B99 /* Ethica */ = {
 			isa = PBXGroup;
 			children = (
+				1EASSETS01F70000000000002 /* Assets.xcassets */,
 				GEMINICFGGRP1A1B2C3D4E5F60001 /* Config */,
 				1E5163082F29D9880061EA4B /* Helpers */,
 				1E5162FC2F28719C0061EA4B /* Models */,
@@ -418,6 +423,7 @@
 				1E5162E22F2870200061EA4B /* EmptyState.swift */,
 				1E5162E32F2870200061EA4B /* ExpandableSection.swift */,
 				1E5162E42F2870200061EA4B /* GlassCard.swift */,
+				1EBRAND012F70000000000002 /* EthicaBrandLogo.swift */,
 				1E5162E52F2870200061EA4B /* LoadingOverlay.swift */,
 				1E5162E62F2870200061EA4B /* PrimaryButton.swift */,
 				1E5162E72F2870200061EA4B /* ProgressBar.swift */,
@@ -606,6 +612,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1EASSETS01F70000000000001 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -715,6 +722,7 @@
 				1EDBMGR12F50000000000001 /* DatabaseManager.swift in Sources */,
 				1E5162EC2F2870200061EA4B /* ProgressBar.swift in Sources */,
 				1E5162ED2F2870200061EA4B /* GlassCard.swift in Sources */,
+				1EBRAND012F70000000000001 /* EthicaBrandLogo.swift in Sources */,
 				1E5162EE2F2870200061EA4B /* StatusBadge.swift in Sources */,
 				1E5162EF2F2870200061EA4B /* ExpandableSection.swift in Sources */,
 				1E5162F02F2870200061EA4B /* PrimaryButton.swift in Sources */,
@@ -914,9 +922,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Ethica.entitlements;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 574L732FM5;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -941,6 +950,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ArhamJain.ethica.Ethica;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -962,9 +972,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Ethica.entitlements;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 574L732FM5;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -989,6 +1000,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ArhamJain.ethica.Ethica;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;

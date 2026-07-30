@@ -45,6 +45,12 @@ env/
 .venv/
 ENV/
 
+# App Store screenshots (local only)
+ss/
+phone/
+ipad-7-inch/
+ipad-10-inch/
+
 # Secrets / credentials (keep local only)
 .env
 GoogleService-Info.plist

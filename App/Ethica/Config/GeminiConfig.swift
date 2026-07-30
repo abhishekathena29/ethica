@@ -15,7 +15,7 @@ enum GeminiConfig {
 
     static var model: String {
         if let m = EnvConfig.value("GEMINI_MODEL"), !m.isEmpty { return m }
-        return "gemini-2.5-flash-lite"
+        return "gemini-3.6-flash"
     }
 
     static var isConfigured: Bool { apiKey != nil }

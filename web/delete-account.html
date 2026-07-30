@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Delete Account — Ethica</title>
+  <meta name="description" content="Request deletion of your Ethica account and related personal data." />
+  <link rel="icon" href="assets/logo-mark.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="index.html">
+        <img src="assets/logo-mark.png" alt="Ethica logo" />
+        Ethica
+      </a>
+      <button class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false">Menu</button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="index.html#support">Support</a></li>
+        <li><a href="privacy-policy.html">Privacy</a></li>
+        <li><a href="terms-and-conditions.html">Terms</a></li>
+        <li><a href="delete-account.html" class="active">Delete account</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <section class="page-hero">
+    <div class="container">
+      <h1>Delete your Ethica account</h1>
+      <p class="meta">Account deletion may be permanent. Please read carefully before you continue.</p>
+    </div>
+  </section>
+
+  <div class="container prose">
+    <div class="warning-box">
+      <strong>Warning: deletion may be permanent</strong>
+      <p>
+        Once your account is deleted, you may lose access to synced preferences, cloud scan history, reviews,
+        and other account data. This action often cannot be undone.
+      </p>
+    </div>
+
+    <h2>How to delete your account</h2>
+    <h3>Option 1 — In the Ethica app</h3>
+    <ol>
+      <li>Open Ethica and go to <strong>Settings</strong></li>
+      <li>Sign in if you are not already signed in</li>
+      <li>Choose <strong>Delete Account</strong> and confirm</li>
+      <li>Local history and session data on that device are cleared</li>
+    </ol>
+
+    <h3>Option 2 — Request by form or email</h3>
+    <p>
+      If you cannot use the in-app option, submit the form below or email
+      <a href="mailto:whitehatarham@gmail.com?subject=Ethica%20Account%20Deletion%20Request">whitehatarham@gmail.com</a>
+      with the subject line “Ethica Account Deletion Request.”
+    </p>
+
+    <h2>What will be deleted</h2>
+    <ul>
+      <li>Your account sign-in access</li>
+      <li>Profile details linked to your account (such as email and display name)</li>
+      <li>Synced preferences and cloud-backed scan history associated with your account</li>
+      <li>Cloud records of reviews, issue reports, alternative interactions, and product submissions tied to your user ID, where technically feasible</li>
+      <li>Local app session and local history on devices where you complete in-app deletion</li>
+    </ul>
+
+    <h2>What may be retained</h2>
+    <ul>
+      <li>Records we must keep for legal, fraud-prevention, security, or accounting reasons</li>
+      <li>Anonymized or aggregated information that no longer identifies you</li>
+      <li>Backups that may take additional time to fully purge</li>
+      <li>Communications you sent to support, for a limited period needed to complete your request</li>
+    </ul>
+
+    <h2>Processing timeline</h2>
+    <div class="info-box">
+      <p>
+        We aim to process account deletion requests within <strong>7 business days</strong> of verification,
+        and to complete deletion or de-identification of personal account data within <strong>30 days</strong>.
+        Complex cases may take longer; we will follow up by email if needed.
+      </p>
+    </div>
+
+    <h2>Guest users</h2>
+    <p>
+      If you used Ethica as a guest without creating an account, there may be no cloud account to delete.
+      You can clear scan history in Settings or uninstall the app to remove local data from your device.
+    </p>
+
+    <div class="form-card">
+      <h2 style="margin-top: 0;">Account deletion request form</h2>
+      <p style="color: var(--text-muted); margin-top: 0;">
+        Submit this form to open an email draft to our support team. Use the same email address registered with Ethica.
+      </p>
+
+      <form id="deleteForm" novalidate>
+        <div class="form-group">
+          <label for="name">Full name</label>
+          <input id="name" name="name" type="text" autocomplete="name" required placeholder="Your name" />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Registered email</label>
+          <input id="email" name="email" type="email" autocomplete="email" required placeholder="you@example.com" />
+          <p class="hint">Must match the email on your Ethica account (Google, Apple, or email sign-in).</p>
+        </div>
+
+        <div class="form-group">
+          <label for="reason">Reason for deletion</label>
+          <select id="reason" name="reason" required>
+            <option value="">Select a reason</option>
+            <option value="No longer using the app">No longer using the app</option>
+            <option value="Privacy concerns">Privacy concerns</option>
+            <option value="Created a duplicate account">Created a duplicate account</option>
+            <option value="Something else">Something else</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="details">Additional details (optional)</label>
+          <textarea id="details" name="details" rows="4" placeholder="Anything that helps us verify and process your request"></textarea>
+        </div>
+
+        <div class="checkbox-row">
+          <input id="confirm" name="confirm" type="checkbox" required />
+          <label for="confirm">
+            I understand that deleting my Ethica account may be permanent and that synced personal data associated with my account will be deleted or de-identified, except where retention is required by law or for security.
+          </label>
+        </div>
+
+        <button class="btn btn-danger" type="submit">Submit deletion request</button>
+        <div class="form-status" id="formStatus" role="status"></div>
+      </form>
+
+      <p style="margin-top: 1.25rem; color: var(--text-dim); font-size: 0.9rem;">
+        Prefer email directly?
+        <a href="mailto:whitehatarham@gmail.com?subject=Ethica%20Account%20Deletion%20Request&body=Please%20delete%20my%20Ethica%20account.%0A%0ARegistered%20email%3A%0AFull%20name%3A%0AReason%3A%0A">
+          Email whitehatarham@gmail.com
+        </a>
+      </p>
+    </div>
+
+    <h2>Contact</h2>
+    <p>
+      Ethica Support<br />
+      Developer: Arham Jain<br />
+      <a href="mailto:whitehatarham@gmail.com">whitehatarham@gmail.com</a>
+    </p>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img src="assets/logo-mark.png" alt="" />
+          <div>
+            <strong>Ethica</strong>
+            <p>Embracing ahimsa — mindful food choices for you and the planet.</p>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="index.html#support">Support</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="privacy-policy.html">Privacy Policy</a></li>
+            <li><a href="terms-and-conditions.html">Terms &amp; Conditions</a></li>
+            <li><a href="delete-account.html">Delete Account</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Ethica. All rights reserved.</span>
+        <span><a href="mailto:whitehatarham@gmail.com">whitehatarham@gmail.com</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const toggle = document.querySelector('.nav-toggle');
+    const links = document.getElementById('navLinks');
+    toggle?.addEventListener('click', () => {
+      const open = links.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+
+    const form = document.getElementById('deleteForm');
+    const status = document.getElementById('formStatus');
+    form?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const reason = document.getElementById('reason').value;
+      const details = document.getElementById('details').value.trim();
+
+      const body = [
+        'Please delete my Ethica account and associated personal data.',
+        '',
+        `Full name: ${name}`,
+        `Registered email: ${email}`,
+        `Reason: ${reason}`,
+        details ? `Additional details: ${details}` : '',
+        '',
+        'I confirm that I understand account deletion may be permanent.'
+      ].filter(Boolean).join('\n');
+
+      const mailto = `mailto:whitehatarham@gmail.com?subject=${encodeURIComponent('Ethica Account Deletion Request')}&body=${encodeURIComponent(body)}`;
+      status.style.display = 'block';
+      status.textContent = 'Opening your email app with the deletion request…';
+      window.location.href = mailto;
+    });
+  </script>
+</body>
+</html>

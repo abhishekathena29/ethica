@@ -720,7 +720,8 @@ struct LiveBarcodeScannerView: View {
 
     private var canSubmitManualBarcode: Bool {
         let digits = manualBarcodeText.trimmingCharacters(in: .whitespacesAndNewlines)
-        return digits.count >= 8 && !isAnalyzing && !isDecodingPickedImage
+        // Allow 6–14 digits for manual lookup (PLUs, EAN-8, UPC-A, EAN-13, ITF-14)
+        return digits.count >= 6 && digits.count <= 14 && !isAnalyzing && !isDecodingPickedImage
     }
 
     @MainActor
@@ -768,13 +769,75 @@ struct LiveBarcodeScannerView: View {
     }
 
     private func submitManualBarcode() {
-        let barcode = manualBarcodeText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let rawBarcode = manualBarcodeText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard canSubmitManualBarcode else { return }
+
+        let digits = rawBarcode.filter(\.isNumber)
+        guard digits.count >= 6 && digits.count <= 14 else {
+            ToastManager.shared.warning("Please enter a valid barcode number (6–14 digits).")
+            return
+        }
 
         isManualBarcodeFocused = false
         scanCooldown = false
         lastScannedBarcode = ""
-        scanBarcode(barcode)
+        // For manual entry, bypass GS1 checksum — look up directly
+        scanBarcodeManual(digits)
+    }
+
+    /// Variant of scanBarcode that skips GS1 checksum validation (for manual typed barcodes).
+    private func scanBarcodeManual(_ barcode: String) {
+        guard !isAnalyzing else { return }
+
+        // Normalize length: pad UPC-E (6 digit) to EAN-8, or try as-is
+        let normalized = BarcodeScanner.normalizeProductBarcode(barcode)
+
+        AppLogger.debug("🔍 Manual barcode lookup: \(normalized)")
+        isAnalyzing = true
+        scanCooldown = true
+        lastScannedBarcode = normalized
+        productPreview = nil
+        showProductNotFoundFlow = false
+
+        isShowingLoadingOverlay = true
+        loadingMode = .barcode
+        loadingProgress = 0.2
+        loadingStep = 1
+
+        HapticManager.shared.trigger(.success)
+
+        lookupDeadlineTask?.cancel()
+        lookupDeadlineTask = Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 8_000_000_000)
+            guard !Task.isCancelled else { return }
+            guard isAnalyzing || isShowingLoadingOverlay else { return }
+            activeBarcodeLookupTask?.cancel()
+            presentProductNotFound(barcode: normalized)
+        }
+
+        activeBarcodeLookupTask?.cancel()
+        activeBarcodeLookupTask = Task { @MainActor in
+            if Task.isCancelled { return }
+            let resolvedResult = await productDatabase.lookupBarcodeForScan(
+                normalized,
+                preferences: preferencesManager.preferences
+            )
+            lookupDeadlineTask?.cancel()
+            lookupDeadlineTask = nil
+            if Task.isCancelled { return }
+            if let result = resolvedResult {
+                let scanHistory = ScanHistory(from: result)
+                HistoryService.shared.saveScan(scanHistory)
+                isShowingLoadingOverlay = false
+                analysisResult = result
+                isAnalyzing = false
+                productPreview = nil
+                showResults = true
+            } else {
+                AppLogger.info("📷 Manual barcode not found — showing contribution flow")
+                presentProductNotFound(barcode: normalized)
+            }
+        }
     }
 
     // MARK: - Nutriscore Color Helper

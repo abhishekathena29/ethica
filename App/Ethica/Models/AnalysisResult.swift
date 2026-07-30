@@ -48,6 +48,8 @@ struct AnalysisResult: Identifiable, Codable, Equatable {
             lhs.crossContaminationRisks == rhs.crossContaminationRisks &&
             lhs.safetyLevel == rhs.safetyLevel &&
             lhs.gmoStatus == rhs.gmoStatus &&
+            lhs.gmoRiskPercentage == rhs.gmoRiskPercentage &&
+            lhs.gmoHighRiskIngredients == rhs.gmoHighRiskIngredients &&
             lhs.nutriscoreGrade == rhs.nutriscoreGrade &&
             lhs.ecoscoreGrade == rhs.ecoscoreGrade &&
             lhs.novaGroup == rhs.novaGroup &&
@@ -151,6 +153,8 @@ struct AnalysisResult: Identifiable, Codable, Equatable {
     // Backend-authoritative safety & nutrition metadata
     let safetyLevel: String?      // "safe" | "caution" | "avoid"
     let gmoStatus: String?        // "confirmed_gmo" | "non_gmo_certified" | "high_risk_unknown" | "no_risk"
+    let gmoRiskPercentage: Double?
+    let gmoHighRiskIngredients: [String]?
     let nutriscoreGrade: String?  // "a" through "e"
     let ecoscoreGrade: String?    // "a" through "e"
     let novaGroup: Int?           // 1-4 (food processing level)
@@ -180,6 +184,7 @@ struct AnalysisResult: Identifiable, Codable, Equatable {
          packageWeightGrams: Double? = nil,
          sourceBarcode: String? = nil, sourceType: String? = nil, timestamp: Date? = nil,
          safetyLevel: String? = nil, gmoStatus: String? = nil,
+         gmoRiskPercentage: Double? = nil, gmoHighRiskIngredients: [String]? = nil,
          nutriscoreGrade: String? = nil, ecoscoreGrade: String? = nil, novaGroup: Int? = nil,
          openFoodFactsDetails: OpenFoodFactsDetails? = nil,
          isRestaurantMenu: Bool? = nil, menuDishes: [MenuDish]? = nil,
@@ -224,6 +229,8 @@ struct AnalysisResult: Identifiable, Codable, Equatable {
         self.timestamp = timestamp
         self.safetyLevel = safetyLevel
         self.gmoStatus = gmoStatus
+        self.gmoRiskPercentage = gmoRiskPercentage
+        self.gmoHighRiskIngredients = gmoHighRiskIngredients
         self.nutriscoreGrade = nutriscoreGrade
         self.ecoscoreGrade = ecoscoreGrade
         self.novaGroup = novaGroup
@@ -253,6 +260,8 @@ struct AnalysisResult: Identifiable, Codable, Equatable {
             additives: additives, packageWeightGrams: packageWeightGrams,
             sourceBarcode: sourceBarcode, sourceType: sourceType, timestamp: timestamp,
             safetyLevel: safetyLevel, gmoStatus: gmoStatus,
+            gmoRiskPercentage: gmoRiskPercentage,
+            gmoHighRiskIngredients: gmoHighRiskIngredients,
             nutriscoreGrade: nutriscoreGrade, ecoscoreGrade: ecoscoreGrade, novaGroup: novaGroup,
             openFoodFactsDetails: openFoodFactsDetails,
             isRestaurantMenu: isRestaurantMenu, menuDishes: menuDishes,
@@ -288,7 +297,9 @@ struct AnalysisResult: Identifiable, Codable, Equatable {
             if let existing = self.crossContaminationRisks, !existing.isEmpty { return existing }
             return enhanced.crossContaminationRisks
         }()
-        let mergedGMO = useEnhancedSafety ? (enhanced.gmoStatus ?? self.gmoStatus) : self.gmoStatus
+        let mergedGMO = useEnhancedSafety ? (enhanced.gmoStatus ?? self.gmoStatus) : (self.gmoStatus ?? enhanced.gmoStatus)
+        let mergedGMORisk = useEnhancedSafety ? (enhanced.gmoRiskPercentage ?? self.gmoRiskPercentage) : (self.gmoRiskPercentage ?? enhanced.gmoRiskPercentage)
+        let mergedGMOHighRisk = useEnhancedSafety ? (enhanced.gmoHighRiskIngredients ?? self.gmoHighRiskIngredients) : (self.gmoHighRiskIngredients ?? enhanced.gmoHighRiskIngredients)
         let mergedSafetyLevel = useEnhancedSafety ? (enhanced.safetyLevel ?? self.safetyLevel) : self.safetyLevel
 
         return AnalysisResult(
@@ -330,6 +341,8 @@ struct AnalysisResult: Identifiable, Codable, Equatable {
             timestamp: self.timestamp,
             safetyLevel: mergedSafetyLevel,
             gmoStatus: mergedGMO,
+            gmoRiskPercentage: mergedGMORisk,
+            gmoHighRiskIngredients: mergedGMOHighRisk,
             // Data — keep from preliminary (already from OFF)
             nutriscoreGrade: self.nutriscoreGrade,
             ecoscoreGrade: self.ecoscoreGrade,
@@ -756,7 +769,7 @@ struct AnalysisResult: Identifiable, Codable, Equatable {
 	        case estimatedCO2, packagingScore, animalWelfareScore
 	        case additives, packageWeightGrams
 	        case sourceBarcode, sourceType, timestamp
-	        case safetyLevel, gmoStatus, nutriscoreGrade, ecoscoreGrade, novaGroup
+	        case safetyLevel, gmoStatus, gmoRiskPercentage, gmoHighRiskIngredients, nutriscoreGrade, ecoscoreGrade, novaGroup
 	        case openFoodFactsDetails
 	        case isRestaurantMenu, menuDishes
 	        case ingredientEducation, crossContaminationRisks
@@ -859,6 +872,8 @@ struct AnalysisResult: Identifiable, Codable, Equatable {
         // Backend-authoritative safety & nutrition metadata
         safetyLevel = try container.decodeIfPresent(String.self, forKey: .safetyLevel)
         gmoStatus = try container.decodeIfPresent(String.self, forKey: .gmoStatus)
+        gmoRiskPercentage = try container.decodeIfPresent(Double.self, forKey: .gmoRiskPercentage)
+        gmoHighRiskIngredients = try container.decodeIfPresent([String].self, forKey: .gmoHighRiskIngredients)
         nutriscoreGrade = try container.decodeIfPresent(String.self, forKey: .nutriscoreGrade)
         ecoscoreGrade = try container.decodeIfPresent(String.self, forKey: .ecoscoreGrade)
         // novaGroup can come as Int or String from backend

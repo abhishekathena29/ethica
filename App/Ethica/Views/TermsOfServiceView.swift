@@ -153,7 +153,7 @@ struct TermsOfServiceView: View {
                         sectionText("""
                         Questions about these terms? Contact us:
 
-                        Email: support@ethica-app.com
+                        Email: whitehatarham@gmail.com
                         Address: [Your Company Address]
                         """)
                     }

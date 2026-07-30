@@ -24,6 +24,18 @@ class BarcodeScanner {
             return fromText
         }
 
+        // 🚀 ULTIMATE ACCURACY FALLBACK: Ask Gemini Vision to extract barcode digits directly from photo!
+        if let jpegData = prepared.jpegData(compressionQuality: 0.85) {
+            if let fromGemini = await GeminiService.shared.readBarcodeFromImage(imageData: jpegData) {
+                let normalized = Self.normalizeProductBarcode(fromGemini)
+                let digits = normalized.filter(\.isNumber)
+                if (6...14).contains(digits.count) {
+                    AppLogger.debug("🤖 Barcode successfully extracted via Gemini Vision: \(normalized)")
+                    return normalized
+                }
+            }
+        }
+
         return nil
     }
 
@@ -304,17 +316,24 @@ class BarcodeScanner {
         }
 
         var seen = Set<String>()
-        return candidates
+        var results = candidates
             .map { normalizeProductBarcode($0) }
             .filter { isValidProductBarcode($0) }
             .filter { seen.insert($0).inserted }
+
+        // Always append the original barcode as a final fallback (e.g. manual entry with bad checksum)
+        // This ensures OFF lookup is attempted even when the checksum doesn't validate locally.
+        let rawNormalized = normalizeProductBarcode(digits)
+        if seen.insert(rawNormalized).inserted {
+            results.append(rawNormalized)
+        }
+        return results
     }
 
     static func isValidProductBarcode(_ barcode: String) -> Bool {
         let digits = barcode.filter(\.isNumber)
         guard !digits.isEmpty, digits.count == barcode.count else { return false }
-        guard [8, 12, 13, 14].contains(digits.count) else { return false }
-        return hasValidGS1Checksum(digits)
+        return (6...14).contains(digits.count)
     }
 
     private static let supportedSymbologies: [VNBarcodeSymbology] = [
@@ -359,6 +378,20 @@ class BarcodeScanner {
 
         if let boosted = base.contrastBoosted() {
             uiCandidates.append(boosted)
+        }
+
+        // Add center crop (middle 70%) to help detect barcodes in complex or framed photos
+        if let cgBase = base.cgImage {
+            let width = CGFloat(cgBase.width)
+            let height = CGFloat(cgBase.height)
+            let centerRect = CGRect(x: width * 0.15, y: height * 0.15, width: width * 0.7, height: height * 0.7)
+            if let centerCg = cgBase.cropping(to: centerRect) {
+                uiCandidates.append(UIImage(cgImage: centerCg))
+            }
+            let bottomRect = CGRect(x: 0, y: height * 0.3, width: width, height: height * 0.7)
+            if let bottomCg = cgBase.cropping(to: bottomRect) {
+                uiCandidates.append(UIImage(cgImage: bottomCg))
+            }
         }
 
         var results: [(CGImage, CGImagePropertyOrientation)] = []

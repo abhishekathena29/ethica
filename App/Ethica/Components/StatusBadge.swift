@@ -45,6 +45,8 @@ struct StatusBadge: View {
             Text(text)
                 .font(size.font)
                 .foregroundColor(variant.foregroundColor)
+                .lineLimit(2)
+                .multilineTextAlignment(.leading)
         }
         .padding(.horizontal, size.horizontalPadding)
         .padding(.vertical, size.verticalPadding)
@@ -409,8 +411,9 @@ struct FlowLayout: Layout {
     var spacing: CGFloat = 8
 
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let width = proposal.replacingUnspecifiedDimensions().width
         let result = FlowResult(
-            in: proposal.replacingUnspecifiedDimensions().width,
+            in: width,
             subviews: subviews,
             spacing: spacing
         )
@@ -424,7 +427,11 @@ struct FlowLayout: Layout {
             spacing: spacing
         )
         for (index, subview) in subviews.enumerated() {
-            subview.place(at: CGPoint(x: bounds.minX + result.positions[index].x, y: bounds.minY + result.positions[index].y), proposal: .unspecified)
+            let itemWidth = min(bounds.width, bounds.width - result.positions[index].x)
+            subview.place(
+                at: CGPoint(x: bounds.minX + result.positions[index].x, y: bounds.minY + result.positions[index].y),
+                proposal: ProposedViewSize(width: itemWidth, height: nil)
+            )
         }
     }
 
@@ -438,7 +445,7 @@ struct FlowLayout: Layout {
             var lineHeight: CGFloat = 0
 
             for subview in subviews {
-                let size = subview.sizeThatFits(.unspecified)
+                let size = subview.sizeThatFits(ProposedViewSize(width: maxWidth, height: nil))
 
                 if x + size.width > maxWidth && x > 0 {
                     x = 0
@@ -448,7 +455,7 @@ struct FlowLayout: Layout {
 
                 positions.append(CGPoint(x: x, y: y))
                 lineHeight = max(lineHeight, size.height)
-                x += size.width + spacing
+                x += min(size.width, maxWidth) + spacing
             }
 
             self.size = CGSize(width: maxWidth, height: y + lineHeight)

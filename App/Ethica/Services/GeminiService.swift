@@ -96,6 +96,38 @@ final class GeminiService {
 
     // MARK: - Take Photo (ingredient label)
 
+    // MARK: - Barcode Extraction via Gemini Vision Fallback
+
+    /// Uses Gemini Vision to read barcode digits directly from an image when optical/Vision framework scanner fails.
+    func readBarcodeFromImage(imageData: Data) async -> String? {
+        let prompt = """
+        Examine this product image carefully to locate any barcode (EAN-13, EAN-8, UPC-A, UPC-E, GTIN-14, Code 128, PLU).
+        Look for printed digits directly below or beside the barcode lines, or anywhere on the package label.
+
+        Return ONLY valid JSON (no markdown):
+        {
+          "barcode": "string with 6-14 digits only, or null if no barcode is found",
+          "confidence": number 0.0-1.0
+        }
+        """
+
+        do {
+            let json = try await generateJSON(imageData: imageData, prompt: prompt)
+            if let barcode = json["barcode"] as? String, !barcode.isEmpty {
+                let digits = barcode.filter(\.isNumber)
+                if digits.count >= 6 && digits.count <= 14 {
+                    AppLogger.debug("🤖 Gemini Vision barcode fallback detected: \(digits)")
+                    return digits
+                }
+            }
+        } catch {
+            AppLogger.error("❌ Gemini Vision barcode fallback error: \(error)")
+        }
+        return nil
+    }
+
+    // MARK: - Take Photo (ingredient label)
+
     /// OCR + safety analysis from a packaged food ingredient label photo.
     func analyzeIngredientLabel(
         imageData: Data,
@@ -109,8 +141,14 @@ final class GeminiService {
         User preferences:
         \(prefs)
 
-        Read all visible text. Extract every ingredient. Check allergens, diets, and GMO preference against the user's settings.
-        mayContainSafe=\(preferences.mayContainSafe) means "may contain" traces are \(preferences.mayContainSafe ? "warnings only" : "treated as unsafe violations").
+        CRITICAL INSTRUCTIONS:
+        1. Multilingual Support: The text on the label may be written in ANY language (English, French, Spanish, German, Italian, Dutch, Hindi, etc.). You must extract, translate, and evaluate all ingredients, allergens, and label declarations regardless of language.
+        2. "May Contain" & Traces: Pay attention to phrases like "may contain", "may contain traces of", "made in a facility", "processed on shared equipment", "peut contenir", "puede contener", "kann spuren enthalten", "può contenere", "traces de", etc.
+           mayContainSafe=\(preferences.mayContainSafe) means cross-contamination warnings are \(preferences.mayContainSafe ? "informational warnings only (cautionWarnings)" : "treated as unsafe violations").
+        3. GMO (Genetically Modified Organism) Analysis:
+           Evaluate ingredients against high-risk GMO crops (corn/maïs, soy/soja, canola/colza, sugar beet/betterave, cottonseed/coton, etc.).
+           Set gmoStatus to "confirmed_gmo", "non_gmo_certified", "high_risk_unknown", or "no_risk".
+           Provide gmoRiskPercentage (0-100 score of GMO risk/presence based on ingredients) and highRiskIngredients (array of high-risk ingredient names found).
 
         Return ONLY valid JSON (no markdown) matching this schema:
         {
@@ -120,6 +158,9 @@ final class GeminiService {
           "allergenContains": ["normalized allergen names found on label"],
           "allergenMayContain": ["may contain / traces"],
           "gmoDeclaration": "string or null",
+          "gmoStatus": "confirmed_gmo|non_gmo_certified|high_risk_unknown|no_risk",
+          "gmoRiskPercentage": number 0-100,
+          "highRiskIngredients": ["string"],
           "isSafe": boolean,
           "safetyLevel": "safe|caution|avoid",
           "confidence": number 0.0-1.0,
@@ -164,8 +205,10 @@ final class GeminiService {
             cautionWarnings: backend.cautionWarnings ?? [],
             detectedAllergens: backend.detectedAllergens ?? [],
             detectionEvidence: nil,
-            crossContaminationRisks: backend.crossContaminationRisks?.compactMap { $0.allergen ?? $0.riskExplanation },
+            crossContaminationRisks: backend.crossContaminationRisks?.compactMap { $0.allergen ?? $0.riskExplanation } ?? backend.allergenMayContain,
             gmoStatus: backend.gmoStatus,
+            gmoRiskPercentage: backend.gmoRiskPercentage,
+            gmoHighRiskIngredients: backend.highRiskIngredients,
             sourceType: "gemini_label",
             extractedIngredients: ingredients,
             ingredientsText: ingredients.joined(separator: ", "),

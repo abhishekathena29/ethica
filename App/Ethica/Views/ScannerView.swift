@@ -157,22 +157,10 @@ struct ScannerView: View {
                 VStack(spacing: 24) {
                     // Clean Header Section
                     VStack(spacing: 16) {
-                        // Simple App Logo
-                        ZStack {
-                            Circle()
-                                .fill(Theme.surfaceBase)
-                                .frame(width: 80, height: 80)
+                        // App brand logo
+                        EthicaBrandLogo(style: .mark, height: 72)
+                            .accessibilityLabel("Ethica app logo")
 
-                            Circle()
-                                .stroke(Theme.surfaceSecondary, lineWidth: 1)
-                                .frame(width: 80, height: 80)
-
-                            Text("🌿")
-                                .font(.system(size: 40))
-                        }
-                        .accessibilityElement(children: .combine)
-                        .accessibilityLabel("Ethica app logo")
-                        
                         VStack(spacing: 6) {
                             Text("Ethica")
                                 .font(Typography.h1)

@@ -158,12 +158,35 @@ class ProductDatabaseService: ObservableObject {
             .replacingOccurrences(of: "  ", with: " ")
 
         let patterns = [
+            // English
             #"(?i)may\s+contain(?:\s+traces?\s+of)?\s+([^\.;\n]+)"#,
             #"(?i)made\s+in\s+a\s+facility\s+that\s+process(?:es|ing)\s+([^\.;\n]+)"#,
             #"(?i)manufactured\s+in\s+a\s+facility\s+that\s+also\s+process(?:es|ing)\s+([^\.;\n]+)"#,
             #"(?i)processed\s+in\s+a\s+facility\s+that\s+(?:also\s+)?(?:process(?:es|ing)|handles?)\s+([^\.;\n]+)"#,
             #"(?i)produced\s+in\s+a\s+facility\s+that\s+also\s+(?:process(?:es|ing)|handles?)\s+([^\.;\n]+)"#,
-            #"(?i)traces?\s+of\s+([^\.;\n]+)"#
+            #"(?i)traces?\s+of\s+([^\.;\n]+)"#,
+            // French
+            #"(?i)peut\s+contenir(?:\s+des\s+traces?\s+de)?\s+([^\.;\n]+)"#,
+            #"(?i)fabriqu[eé]\s+dans\s+un\s+atelier\s+qui\s+utilise\s+([^\.;\n]+)"#,
+            #"(?i)produit\s+dans\s+une\s+usine\s+qui\s+traite\s+([^\.;\n]+)"#,
+            #"(?i)traces?\s+de\s+([^\.;\n]+)"#,
+            // Spanish
+            #"(?i)puede\s+contener(?:\s+trazas?\s+de)?\s+([^\.;\n]+)"#,
+            #"(?i)elaborado\s+en\s+instalaciones\s+que\s+procesan\s+([^\.;\n]+)"#,
+            #"(?i)fabricado\s+en\s+una\s+planta\s+que\s+procesa\s+([^\.;\n]+)"#,
+            #"(?i)trazas?\s+de\s+([^\.;\n]+)"#,
+            // German
+            #"(?i)kann\s+spuren\s+von\s+([^\.;\n]+)\s+enthalten"#,
+            #"(?i)kann\s+spuren\s+enthalten(?:\s+von)?\s+([^\.;\n]+)"#,
+            #"(?i)hergestellt\s+in\s+einem\s+betrieb(?:\s+der)?\s+([^\.;\n]+)"#,
+            #"(?i)spuren\s+von\s+([^\.;\n]+)"#,
+            // Italian
+            #"(?i)pu[oò]\s+contenere(?:\s+tracce\s+di)?\s+([^\.;\n]+)"#,
+            #"(?i)prodotto\s+in\s+uno\s+stabilimento\s+che\s+lavora\s+([^\.;\n]+)"#,
+            #"(?i)tracce\s+di\s+([^\.;\n]+)"#,
+            // Dutch
+            #"(?i)kan\s+sporen\s+bevatten(?:\s+van)?\s+([^\.;\n]+)"#,
+            #"(?i)geproduceerd\s+in\s+een\s+fabriek\s+die\s+([^\.;\n]+)"#
         ]
 
         var found: [String] = []
@@ -486,15 +509,17 @@ class ProductDatabaseService: ObservableObject {
             logger.debug("✅ OpenFoodFacts hit (scan): \(barcode)")
 
             let ingredients = openFoodFactsClient.extractIngredients(from: offProduct)
+            let productName = offProduct.productNameEn ?? offProduct.productName ?? "Unknown Product"
             await cacheService.save(
                 barcode: barcode,
-                productName: offProduct.productNameEn ?? offProduct.productName ?? "Unknown Product",
+                productName: productName,
                 ingredients: ingredients,
                 allergens: offProduct.allergens,
                 ethicalScore: nil,
                 ethicalSummary: openFoodFactsClient.getEthicalSummary(from: offProduct)
             )
 
+            // Build a preliminary result to return immediately for fast display
             var result = buildPreliminaryResult(
                 product: offProduct,
                 barcode: barcode,
@@ -506,54 +531,65 @@ class ProductDatabaseService: ObservableObject {
             result = mergeDietaryViolations(into: result, product: offProduct, preferences: preferences)
             result = applyJainValidation(result, preferences: preferences)
 
-            // Enrich in background — quick allergen check handles AI when ingredients exist.
-            if ingredients.isEmpty {
-                activeEnrichmentTask?.cancel()
-                let capturedProduct = offProduct
-                let capturedRawJSON = rawOFFJSON
-                activeEnrichmentTask = Task { [weak self] in
-                    await self?.runBackendEnrichment(
-                        product: capturedProduct,
-                        barcode: barcode,
-                        preferences: preferences,
-                        rawOFFJSON: capturedRawJSON
-                    )
-                }
-            }
+            // Always run quick AI check in background — even when ingredients are missing,
+            // we pass product name + brand so Gemini can make an informed assessment.
+            let capturedProduct = offProduct
+            let capturedRawJSON = rawOFFJSON
 
-            if !ingredients.isEmpty {
-                let capturedProduct = offProduct
-                let capturedRawJSON = rawOFFJSON
-                let ingredientsText = Self.fullLabelText(
+            let effectiveIngredients: [String]
+            let ingredientsText: String
+
+            if ingredients.isEmpty {
+                // No ingredient list from OFF — use product name/brand as proxy for Gemini
+                let nameHint = [productName, offProduct.brands].compactMap { $0 }.joined(separator: " — ")
+                effectiveIngredients = [nameHint]
+                ingredientsText = "Product: \(nameHint). No ingredient list available from OpenFoodFacts — infer from product name and category."
+                logger.warning("⚠️ No OFF ingredients for \(barcode) — using name context for Gemini quick-check")
+            } else {
+                effectiveIngredients = ingredients
+                ingredientsText = Self.fullLabelText(
                     product: capturedProduct,
                     rawOFFJSON: capturedRawJSON,
                     ingredients: ingredients
                 )
-                Task { [weak self] in
-                    guard let self else { return }
-                    let safetyLookup = await self.withTimeout(seconds: 12) {
-                        await NetworkService.shared.quickAllergenCheck(
-                            ingredients: ingredients,
-                            ingredientsText: ingredientsText,
-                            preferences: preferences,
+            }
+
+            Task { [weak self] in
+                guard let self else { return }
+                let safetyLookup = await self.withTimeout(seconds: 14) {
+                    await NetworkService.shared.quickAllergenCheck(
+                        ingredients: effectiveIngredients,
+                        ingredientsText: ingredientsText,
+                        preferences: preferences,
+                        barcode: barcode,
+                        productName: capturedProduct.productNameEn ?? capturedProduct.productName,
+                        openfoodfactsData: capturedRawJSON
+                    )
+                }
+                guard let safety = safetyLookup.value ?? nil else {
+                    // Quick-check timed out — try full backend enrichment as last resort
+                    if !ingredients.isEmpty {
+                        await self.runBackendEnrichment(
+                            product: capturedProduct,
                             barcode: barcode,
-                            productName: capturedProduct.productNameEn ?? capturedProduct.productName,
-                            openfoodfactsData: capturedRawJSON
+                            preferences: preferences,
+                            rawOFFJSON: capturedRawJSON
                         )
                     }
-                    guard let safety = safetyLookup.value ?? nil else { return }
-                    var updated = self.buildPreliminaryResult(
-                        product: capturedProduct,
-                        barcode: barcode,
-                        preferences: preferences,
-                        safetyResult: safety,
-                        rawOFFJSON: capturedRawJSON
-                    )
-                    updated = self.mergeAllergens(into: updated, product: capturedProduct, preferences: preferences)
-                    updated = self.mergeDietaryViolations(into: updated, product: capturedProduct, preferences: preferences)
-                    updated = self.applyJainValidation(updated, preferences: preferences)
-                    ProductDatabaseService.enhancedResultSubject.send(updated)
+                    return
                 }
+                var updated = self.buildPreliminaryResult(
+                    product: capturedProduct,
+                    barcode: barcode,
+                    preferences: preferences,
+                    safetyResult: safety,
+                    rawOFFJSON: capturedRawJSON
+                )
+                updated = self.mergeAllergens(into: updated, product: capturedProduct, preferences: preferences)
+                updated = self.mergeDietaryViolations(into: updated, product: capturedProduct, preferences: preferences)
+                updated = self.applyJainValidation(updated, preferences: preferences)
+                ProductDatabaseService.enhancedResultSubject.send(updated)
+                await self.aiCache.save(barcode: barcode, preferences: preferences, result: updated)
             }
 
             return result
@@ -927,12 +963,12 @@ class ProductDatabaseService: ObservableObject {
                 let l = label.lowercased()
                 return l.contains("non-gmo") || l.contains("non gmo") || l.contains("organic")
             }
-            if preferences.avoidGMO && !hasNonGMOLabel {
+            if hasNonGMOLabel {
+                gmoStatus = "non_gmo_certified"
+            } else if preferences.avoidGMO {
                 let gmoWarnings = flagHighRiskGMOIngredients(ingredients)
                 if !gmoWarnings.isEmpty {
                     cautionWarnings.append(contentsOf: gmoWarnings)
-                    // Only set a GMO status when the user explicitly cares about GMO avoidance.
-                    // This avoids confusing "?" badges for users who didn't enable GMO checks.
                     gmoStatus = "high_risk_unknown"
                 }
             }
@@ -945,6 +981,24 @@ class ProductDatabaseService: ObservableObject {
             }
             confidence = 50  // Lower confidence for client-side only
         }
+
+        let highRiskGMOFound = extractHighRiskGMOIngredients(ingredients)
+        let labelsTags = (rawOFFJSON?["labels_tags"] as? [String]) ?? []
+        let hasNonGMOLabel = labelsTags.contains { label in
+            let l = label.lowercased()
+            return l.contains("non-gmo") || l.contains("non gmo") || l.contains("organic")
+        }
+        if gmoStatus == nil {
+            if hasNonGMOLabel {
+                gmoStatus = "non_gmo_certified"
+            } else if !highRiskGMOFound.isEmpty {
+                gmoStatus = "high_risk_unknown"
+            } else {
+                gmoStatus = "no_risk"
+            }
+        }
+        let computedGMORiskPercent = safetyResult?.gmoRiskPercentage ?? calculateGMORiskPercentage(ingredients: ingredients, highRiskIngredients: highRiskGMOFound, hasNonGMOCertification: hasNonGMOLabel)
+        let finalGMOHighRisk = safetyResult?.gmoHighRiskIngredients ?? highRiskGMOFound
 
         // Environmental score from OFF eco-score
         let envScore: Double
@@ -985,6 +1039,8 @@ class ProductDatabaseService: ObservableObject {
             sourceType: "preliminary",
             safetyLevel: safetyLevel,
             gmoStatus: gmoStatus,
+            gmoRiskPercentage: computedGMORiskPercent,
+            gmoHighRiskIngredients: finalGMOHighRisk,
             nutriscoreGrade: product.nutriscoreGrade,
             ecoscoreGrade: product.ecoscoreGrade,
             novaGroup: product.novaGroup,
@@ -999,6 +1055,60 @@ class ProductDatabaseService: ObservableObject {
             )
         )
         return mergeCrossContaminationRisks(into: baseResult, openFoodFactsDetails: offDetails, preferences: preferences)
+    }
+
+    // MARK: - Client-Side Multilingual GMO High-Risk Flagging
+
+    /// Multilingual list of high-risk GMO crops & derivatives (EN, FR, ES, DE, IT, NL, HI)
+    private static let multilingualHighRiskGMOCrops = [
+        // English
+        "corn", "maize", "soy", "soybean", "canola", "rapeseed", "sugar beet", "cottonseed", "papaya", "alfalfa", "zucchini", "squash",
+        "corn syrup", "high fructose corn syrup", "soy lecithin", "canola oil", "cottonseed oil", "corn starch", "soybean oil", "tofu",
+        // French
+        "maïs", "soja", "soya", "colza", "betterave", "betterave sucrière", "coton", "papaye", "luzerne", "courgette",
+        "sirop de maïs", "lécithine de soja", "huile de soja", "huile de colza", "fécule de maïs",
+        // Spanish
+        "maíz", "soya", "canola", "remolacha", "remolacha azucarera", "algodón", "luzerna", "calabacín",
+        "jarabe de maíz", "lecitina de soya", "aceite de soja", "aceite de canola", "almidón de maíz",
+        // German
+        "mais", "sojalecithin", "sojaöl", "rapsöl", "zuckerrübe", "baumwolle", "maissirup", "maisstärke",
+        // Italian
+        "sciroppo di mais", "lecitina di soia", "olio di soia", "olio di colza", "amido di mais",
+        // Dutch
+        "maïsstroop", "sojalecithine", "soja-olie", "maïszetmeel"
+    ]
+
+    private func flagHighRiskGMOIngredients(_ ingredients: [String]) -> [String] {
+        let matched = extractHighRiskGMOIngredients(ingredients)
+        return matched.map { "ℹ️ Possible GMO ingredient: \($0)" }
+    }
+
+    private func extractHighRiskGMOIngredients(_ ingredients: [String]) -> [String] {
+        var found: [String] = []
+        for ingredient in ingredients {
+            let lower = ingredient.lowercased()
+            for risk in Self.multilingualHighRiskGMOCrops {
+                if matchesWord(lower, risk) {
+                    if !found.contains(ingredient) {
+                        found.append(ingredient)
+                    }
+                    break
+                }
+            }
+        }
+        return found
+    }
+
+    private func calculateGMORiskPercentage(ingredients: [String], highRiskIngredients: [String], hasNonGMOCertification: Bool) -> Double {
+        if hasNonGMOCertification {
+            return 0.0
+        }
+        guard !ingredients.isEmpty else {
+            return highRiskIngredients.isEmpty ? 0.0 : 50.0
+        }
+        let riskRatio = Double(highRiskIngredients.count) / Double(ingredients.count)
+        let estimatedPercent = min(100.0, max(25.0, riskRatio * 160.0))
+        return highRiskIngredients.isEmpty ? 0.0 : (round(estimatedPercent * 10) / 10)
     }
 
     // MARK: - Background Enrichment
@@ -1042,26 +1152,6 @@ class ProductDatabaseService: ObservableObject {
         }
 
         return true
-    }
-
-    // MARK: - Client-Side GMO High-Risk Flagging
-
-    /// Flags ingredients from known GMO high-risk crops (client-side fallback when quick-check is unavailable)
-    private func flagHighRiskGMOIngredients(_ ingredients: [String]) -> [String] {
-        let highRiskGMO = ["corn", "soy", "canola", "sugar beet", "cottonseed", "papaya",
-                           "corn syrup", "high fructose corn syrup", "soy lecithin",
-                           "canola oil", "cottonseed oil", "corn starch", "soybean oil"]
-        var warnings: [String] = []
-        for ingredient in ingredients {
-            let lower = ingredient.lowercased()
-            for risk in highRiskGMO {
-                if matchesWord(lower, risk) {
-                    warnings.append("ℹ️ Possible GMO ingredient: \(ingredient)")
-                    break
-                }
-            }
-        }
-        return warnings
     }
     
     /// Complete product lookup pipeline
@@ -1961,6 +2051,7 @@ class ProductDatabaseService: ObservableObject {
             }
             t = t.replacingOccurrences(of: "_", with: " ")
             t = t.replacingOccurrences(of: "-", with: " ")
+            t = t.replacingOccurrences(of: "contening", with: "containing")
             return t.trimmingCharacters(in: .whitespacesAndNewlines)
         }
 
@@ -1988,24 +2079,29 @@ class ProductDatabaseService: ObservableObject {
 
         for text in labelTexts {
             for allergen in Self.extractCrossContaminationAllergens(from: text) {
-                tracesSet.insert(allergen.lowercased())
+                let n = normalizeOffToken(allergen)
+                if !n.isEmpty { tracesSet.insert(n) }
             }
         }
 
         guard !tracesSet.isEmpty else { return result }
 
         var mergedRisks: [AnalysisResult.CrossContaminationRisk] = result.crossContaminationRisks ?? []
-        let existing = Set(mergedRisks.map { $0.allergen.lowercased() })
-        for trace in tracesSet.sorted() where !existing.contains(trace.lowercased()) {
-            mergedRisks.append(AnalysisResult.CrossContaminationRisk(
-                allergen: trace,
-                riskLevel: "Medium",
-                riskExplanation: "May contain traces of \(trace) (cross-contamination warning from OpenFoodFacts).",
-                manufacturingDetails: "Shared facility/equipment possible",
-                guidance: preferences.mayContainSafe
-                    ? "Informational only (relaxed mode). Verify the label if you have severe allergies."
-                    : "Strict mode: treat as unsafe for your allergens."
-            ))
+        var existing = Set(mergedRisks.map { normalizeOffToken($0.allergen) })
+        for trace in tracesSet.sorted() {
+            let normalized = normalizeOffToken(trace)
+            if !normalized.isEmpty && !existing.contains(normalized) {
+                existing.insert(normalized)
+                mergedRisks.append(AnalysisResult.CrossContaminationRisk(
+                    allergen: normalized,
+                    riskLevel: "Medium",
+                    riskExplanation: "May contain traces of \(normalized) (cross-contamination warning from OpenFoodFacts).",
+                    manufacturingDetails: "Shared facility/equipment possible",
+                    guidance: preferences.mayContainSafe
+                        ? "Informational only (relaxed mode). Verify the label if you have severe allergies."
+                        : "Strict mode: treat as unsafe for your allergens."
+                ))
+            }
         }
 
         // Strict mode: if any risk matches user allergens, escalate to unsafe.

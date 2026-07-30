@@ -55,9 +55,7 @@ struct PreferencesView: View {
                 LazyVStack(spacing: Spacing.lg) {
                     // Header
                     VStack(spacing: 8) {
-                        Text("🌿 Ethica")
-                            .font(Typography.h1)
-                            .foregroundColor(Theme.textPrimary)
+                        EthicaBrandLogo(style: .mark, height: 48)
                             .accessibilityLabel("Ethica")
                             .accessibilityAddTraits(.isHeader)
 
@@ -886,16 +884,17 @@ struct CustomInputSection: View {
 @available(iOS 16.0, *)
 struct PreferencesFlowLayout: Layout {
     var spacing: CGFloat = 8
-    
+
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let width = proposal.replacingUnspecifiedDimensions().width
         let result = FlowResult(
-            in: proposal.replacingUnspecifiedDimensions().width,
+            in: width,
             subviews: subviews,
             spacing: spacing
         )
         return result.size
     }
-    
+
     func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
         let result = FlowResult(
             in: bounds.width,
@@ -903,33 +902,37 @@ struct PreferencesFlowLayout: Layout {
             spacing: spacing
         )
         for (index, subview) in subviews.enumerated() {
-            subview.place(at: CGPoint(x: bounds.minX + result.positions[index].x, y: bounds.minY + result.positions[index].y), proposal: .unspecified)
+            let itemWidth = min(bounds.width, bounds.width - result.positions[index].x)
+            subview.place(
+                at: CGPoint(x: bounds.minX + result.positions[index].x, y: bounds.minY + result.positions[index].y),
+                proposal: ProposedViewSize(width: itemWidth, height: nil)
+            )
         }
     }
-    
+
     struct FlowResult {
         var size: CGSize = .zero
         var positions: [CGPoint] = []
-        
+
         init(in maxWidth: CGFloat, subviews: Subviews, spacing: CGFloat) {
             var x: CGFloat = 0
             var y: CGFloat = 0
             var lineHeight: CGFloat = 0
-            
+
             for subview in subviews {
-                let size = subview.sizeThatFits(.unspecified)
-                
+                let size = subview.sizeThatFits(ProposedViewSize(width: maxWidth, height: nil))
+
                 if x + size.width > maxWidth && x > 0 {
                     x = 0
                     y += lineHeight + spacing
                     lineHeight = 0
                 }
-                
+
                 positions.append(CGPoint(x: x, y: y))
                 lineHeight = max(lineHeight, size.height)
-                x += size.width + spacing
+                x += min(size.width, maxWidth) + spacing
             }
-            
+
             self.size = CGSize(width: maxWidth, height: y + lineHeight)
         }
     }

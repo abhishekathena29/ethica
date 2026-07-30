@@ -22,6 +22,8 @@ struct QuickSafetyResult: Codable {
     let detectionEvidence: [AnalysisResult.DetectionEvidence]?
     let crossContaminationRisks: [String]?
     let gmoStatus: String?
+    let gmoRiskPercentage: Double?
+    let gmoHighRiskIngredients: [String]?
     let sourceType: String?
     // Extra fields from /quick-safety-check (ingredient photo OCR)
     let extractedIngredients: [String]?
@@ -145,6 +147,8 @@ class NetworkService: ObservableObject {
                 detectionEvidence: nil,
                 crossContaminationRisks: mayContain.isEmpty ? nil : mayContain,
                 gmoStatus: json["gmoStatus"] as? String,
+                gmoRiskPercentage: json["gmoRiskPercentage"] as? Double,
+                gmoHighRiskIngredients: json["highRiskIngredients"] as? [String],
                 sourceType: "gemini_text",
                 extractedIngredients: ingredients,
                 ingredientsText: text,
@@ -933,6 +937,8 @@ class NetworkService: ObservableObject {
             sourceBarcode: response.sourceBarcode,
             sourceType: response.sourceType,
             gmoStatus: response.gmoStatus ?? "no_risk",
+            gmoRiskPercentage: response.gmoRiskPercentage,
+            gmoHighRiskIngredients: response.highRiskIngredients,
             safetyConfidenceExplanation: safetyConf,
             ingredientEducation: typedIngredientEdu,
             crossContaminationRisks: typedCrossContam

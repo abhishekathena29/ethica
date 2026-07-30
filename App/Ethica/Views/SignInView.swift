@@ -180,60 +180,7 @@ struct SignInView: View {
     // MARK: - Logo Section
 
     private var logoSection: some View {
-        VStack(spacing: Spacing.md) {
-            // Animated logo with glow
-            ZStack {
-                // Glow effect (rasterized, no blur)
-                Circle()
-                    .fill(
-                        RadialGradient(
-                            gradient: Gradient(colors: [
-                                Theme.success.opacity(0.25),
-                                Theme.success.opacity(0.08),
-                                Color.clear
-                            ]),
-                            center: .center,
-                            startRadius: 20,
-                            endRadius: 90
-                        )
-                    )
-                    .frame(width: 180, height: 180)
-
-                // Logo icon
-                ZStack {
-                    Circle()
-                        .fill(Theme.success.opacity(0.2))
-                        .frame(width: 100, height: 100)
-
-                    Image(systemName: "leaf.fill")
-                        .font(.system(size: 50, weight: .semibold))
-                        .foregroundStyle(
-                            LinearGradient(
-                                colors: [Theme.success, Theme.accent],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                }
-            }
-
-            Text("Ethica")
-                .font(.system(size: 52, weight: .bold, design: .rounded))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [.white, .white.opacity(0.9)],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                )
-
-            Text("Embracing Ahimsa")
-                .font(.system(size: 18, weight: .medium, design: .rounded))
-                .foregroundColor(.white.opacity(0.7))
-                .tracking(2)
-        }
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("Ethica, embracing ahimsa")
+        EthicaBrandLogo(style: .full, height: 180, showTagline: true)
     }
 
     // MARK: - Form Section

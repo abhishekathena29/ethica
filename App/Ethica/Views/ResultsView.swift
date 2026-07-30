@@ -106,6 +106,9 @@ struct ResultsView: View {
                         // Quick stats row
                         quickStatsRow
 
+                        // GMO Overview Card — always shown for barcode scans
+                        gmoOverviewCard
+
                         // Compact violations/warnings pills
                         if hasIssues {
                             issuesPillsSection
@@ -649,8 +652,8 @@ struct ResultsView: View {
     }
 
     private func cleanIssueText(_ text: String) -> String {
-        // Remove emoji prefixes like ⛔, ⚠️, 🧬, ℹ️, ❌, ✓, etc
-        var cleaned = text
+        // Remove emoji prefixes like ⛔, ⚠️, 🧬, ℹ️, ❌, ✓, etc and fix raw OFF typos
+        var cleaned = text.replacingOccurrences(of: "contening", with: "containing")
         while let first = cleaned.unicodeScalars.first,
               !first.properties.isAlphabetic && !first.properties.isASCIIHexDigit && first != "(" {
             cleaned = String(cleaned.unicodeScalars.dropFirst())
@@ -1887,6 +1890,142 @@ struct ResultsView: View {
             await TasteProfileService.shared.recordTasteData(from: currentResult, userKept: userKept)
         }
     }
+
+    // MARK: - GMO Overview Card (always shown in main overview)
+
+    @ViewBuilder
+    private var gmoOverviewCard: some View {
+        let gmoStatus   = currentResult.gmoStatus
+        let riskPct     = currentResult.gmoRiskPercentage
+        let highRisk    = currentResult.gmoHighRiskIngredients ?? []
+
+        let hasData     = gmoStatus != nil || riskPct != nil
+        let lower       = (gmoStatus ?? "").lowercased()
+        let isConfirmed = lower == "confirmed_gmo"
+        let isHighRisk  = lower == "high_risk_unknown"
+        let isNonGMO    = lower == "non_gmo_certified" || lower == "no_risk"
+
+        let cardColor: Color          = isConfirmed ? Theme.error : (isHighRisk ? Theme.warning : Theme.success)
+        let cardVariant: GlassCardVariant = isConfirmed ? .error : (isHighRisk ? .warning : .success)
+        let risk: Double              = riskPct ?? (isNonGMO ? 0 : (highRisk.isEmpty ? 30 : 65))
+
+        GlassCard(variant: hasData ? cardVariant : .primary) {
+            VStack(alignment: .leading, spacing: 12) {
+
+                // Header row
+                HStack(spacing: 8) {
+                    Image(systemName: isNonGMO ? "checkmark.seal.fill"
+                                    : isConfirmed ? "exclamationmark.triangle.fill"
+                                    : isHighRisk ? "exclamationmark.circle.fill"
+                                    : "dna")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundColor(hasData ? cardColor : Theme.textMuted)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("GMO (Genetically Modified Organism)")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(Theme.textPrimary)
+
+                        if hasData {
+                            Text(gmoStatusLabel(gmoStatus ?? ""))
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundColor(cardColor)
+                        } else {
+                            Text("Analyzing GMO safety\u{2026}")
+                                .font(.system(size: 12))
+                                .foregroundColor(Theme.textMuted)
+                        }
+                    }
+
+                    Spacer()
+
+                    if hasData {
+                        Text("\(Int(risk))%")
+                            .font(.system(size: 22, weight: .bold))
+                            .foregroundColor(cardColor)
+                    }
+                }
+
+                if hasData {
+                    // Risk meter bar
+                    VStack(alignment: .leading, spacing: 4) {
+                        GeometryReader { geo in
+                            ZStack(alignment: .leading) {
+                                RoundedRectangle(cornerRadius: 4)
+                                    .fill(cardColor.opacity(0.15))
+                                    .frame(height: 8)
+                                RoundedRectangle(cornerRadius: 4)
+                                    .fill(cardColor)
+                                    .frame(width: geo.size.width * CGFloat(min(risk, 100) / 100), height: 8)
+                                    .animation(.spring(response: 0.8, dampingFraction: 0.7), value: risk)
+                            }
+                        }
+                        .frame(height: 8)
+                        HStack {
+                            Text("No Risk").font(.system(size: 10)).foregroundColor(Theme.textMuted)
+                            Spacer()
+                            Text("High Risk").font(.system(size: 10)).foregroundColor(Theme.textMuted)
+                        }
+                    }
+
+                    // High-risk ingredient badges
+                    if !highRisk.isEmpty {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("High-Risk Ingredients:")
+                                .font(.system(size: 11, weight: .semibold))
+                                .foregroundColor(Theme.textSecondary)
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 6) {
+                                    ForEach(Array(highRisk.prefix(6)), id: \.self) { ingredient in
+                                        Text(ingredient.capitalized)
+                                            .font(.system(size: 11, weight: .medium))
+                                            .foregroundColor(cardColor)
+                                            .padding(.horizontal, 8)
+                                            .padding(.vertical, 4)
+                                            .background(cardColor.opacity(0.12))
+                                            .cornerRadius(6)
+                                    }
+                                    if highRisk.count > 6 {
+                                        Text("+\(highRisk.count - 6) more")
+                                            .font(.system(size: 11))
+                                            .foregroundColor(Theme.textMuted)
+                                            .padding(.horizontal, 8)
+                                            .padding(.vertical, 4)
+                                            .background(Theme.textMuted.opacity(0.08))
+                                            .cornerRadius(6)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    // Shimmer placeholder while Gemini analyzes
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(Theme.textMuted.opacity(0.15))
+                        .frame(height: 8)
+                }
+
+                // Educational footnote
+                Text("In food, GMOs are plants/animals/microorganisms whose DNA has been altered via genetic engineering to introduce traits not found in traditional breeding.")
+                    .font(.system(size: 11))
+                    .foregroundColor(Theme.textMuted)
+                    .lineLimit(3)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .scaleIn(delay: 0.25)
+    }
+
+    // Shared GMO status label for the overview card
+    private func gmoStatusLabel(_ status: String) -> String {
+        switch status.lowercased() {
+        case "confirmed_gmo":        return "Contains GMOs"
+        case "non_gmo_certified":    return "Non-GMO Certified"
+        case "high_risk_unknown":    return "May Contain GMO"
+        case "no_risk":              return "No GMO Risk"
+        default:                     return "GMO Status Unknown"
+        }
+    }
 }
 
 // MARK: - Safety State
@@ -2063,9 +2202,9 @@ struct FullDetailsSheet: View {
                     foodGradingBadgesRow
                 }
 
-                // GMO status badge
+                // GMO status badge & detailed educational breakdown
                 if let gmo = result.gmoStatus, !gmo.isEmpty {
-                    gmoStatusBadge(gmo)
+                    gmoDetailedCard(gmo)
                 }
 
                 // Overall verdict badge
@@ -2169,7 +2308,111 @@ struct FullDetailsSheet: View {
         }
     }
 
-    // MARK: - GMO Status Badge
+    private func gmoDetailedCard(_ gmo: String) -> some View {
+        let lowerStatus = gmo.lowercased()
+        let isConfirmed = lowerStatus == "confirmed_gmo"
+        let isHighRisk = lowerStatus == "high_risk_unknown"
+        let isNonGMO = lowerStatus == "non_gmo_certified" || lowerStatus == "no_risk"
+
+        let cardVariant: GlassCardVariant = isConfirmed ? .error : (isHighRisk ? .warning : .success)
+        let themeColor: Color = isConfirmed ? Theme.error : (isHighRisk ? Theme.warning : Theme.success)
+        let statusText = gmoStatusLabel(gmo)
+
+        let riskPercentage = result.gmoRiskPercentage ?? (isNonGMO ? 0.0 : (result.gmoHighRiskIngredients?.isEmpty == false ? 75.0 : 50.0))
+        let highRiskItems = result.gmoHighRiskIngredients ?? []
+
+        return GlassCard(variant: cardVariant) {
+            VStack(alignment: .leading, spacing: Spacing.sm) {
+                // Header Row
+                HStack(alignment: .center, spacing: Spacing.xs) {
+                    Image(systemName: gmoStatusIcon(gmo))
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(themeColor)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("GMO (Genetically Modified Organism)")
+                            .font(.system(size: 15, weight: .bold))
+                            .foregroundColor(Theme.textPrimary)
+
+                        Text(statusText)
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(themeColor)
+                    }
+
+                    Spacer()
+
+                    // Percentage Badge
+                    VStack(spacing: 2) {
+                        Text("\(Int(riskPercentage))%")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(themeColor)
+                        Text("GMO Risk")
+                            .font(.system(size: 10, weight: .medium))
+                            .foregroundColor(Theme.textTertiary)
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(Color.white.opacity(0.1))
+                    .cornerRadius(8)
+                }
+
+                // Visual GMO Risk Meter
+                VStack(alignment: .leading, spacing: 4) {
+                    GeometryReader { geo in
+                        ZStack(alignment: .leading) {
+                            Capsule()
+                                .fill(Color.white.opacity(0.15))
+                                .frame(height: 6)
+
+                            Capsule()
+                                .fill(themeColor)
+                                .frame(width: max(8, geo.size.width * CGFloat(riskPercentage / 100.0)), height: 6)
+                        }
+                    }
+                    .frame(height: 6)
+                }
+                .padding(.vertical, 4)
+
+                // High Risk Ingredients List
+                if !highRiskItems.isEmpty {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("High-Risk GMO Ingredients Detected:")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundColor(Theme.textSecondary)
+
+                        FlowLayout(spacing: 6) {
+                            ForEach(highRiskItems, id: \.self) { item in
+                                Text(item.capitalized)
+                                    .font(.system(size: 12, weight: .medium))
+                                    .foregroundColor(Theme.textPrimary)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 4)
+                                    .background(isConfirmed ? Theme.error.opacity(0.25) : Theme.warning.opacity(0.25))
+                                    .cornerRadius(6)
+                            }
+                        }
+                    }
+                }
+
+                Divider()
+                    .background(Color.white.opacity(0.15))
+                    .padding(.vertical, 2)
+
+                // Educational Definition & Context
+                VStack(alignment: .leading, spacing: 4) {
+                    Label("What is a GMO?", systemImage: "info.circle.fill")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(Theme.textSecondary)
+
+                    Text("In the context of food, GMO (Genetically Modified Organism) refers to plants, animals, or microorganisms whose DNA has been altered using genetic engineering to introduce specific traits that don't occur naturally through traditional breeding. GMOs are created to increase crop yield, enhance pest/disease resistance, improve herbicide tolerance, or enhance nutritional value.")
+                        .font(.system(size: 11, weight: .regular))
+                        .foregroundColor(Theme.textTertiary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+    }
+
     private func gmoStatusBadge(_ status: String) -> some View {
         StatusBadge(
             gmoStatusLabel(status),

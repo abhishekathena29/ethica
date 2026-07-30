@@ -206,31 +206,9 @@ struct OnboardingView: View {
                 Spacer().frame(height: Spacing.xl)
 
                 // Logo
-                ZStack {
-                    // Outer glow
-                    Circle()
-                        .fill(Theme.primary.opacity(0.12))
-                        .frame(width: 140, height: 140)
-                        .blur(radius: 30)
-
-                    // Inner glow
-                    Circle()
-                        .fill(Theme.primary.opacity(0.08))
-                        .frame(width: 100, height: 100)
-
-                    Image(systemName: "leaf.fill")
-                        .font(.system(size: 52, weight: .semibold))
-                        .foregroundStyle(
-                            LinearGradient(
-                                colors: [Theme.primary, Theme.primaryLight],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .shadow(color: Theme.primary.opacity(0.4), radius: 10, y: 4)
-                }
-                .accessibilityHidden(true)
-                .scaleIn(delay: 0.1)
+                EthicaBrandLogo(style: .full, height: 140)
+                    .accessibilityHidden(true)
+                    .scaleIn(delay: 0.1)
 
                 VStack(spacing: Spacing.sm) {
                     Text("Welcome to Ethica")
