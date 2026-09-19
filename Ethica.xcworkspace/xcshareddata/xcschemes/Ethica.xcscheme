@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1500"
-   version = "1.7">
+   LastUpgradeVersion = "2660"
+   version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES">
@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "1DDE12A82CD7C5040087C78B"
+               BlueprintIdentifier = "1E481E322EC400D3009F8B99"
                BuildableName = "Ethica.app"
                BlueprintName = "Ethica"
                ReferencedContainer = "container:Ethica.xcodeproj">
@@ -27,6 +27,8 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
+      <Testables>
+      </Testables>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -42,7 +44,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "1DDE12A82CD7C5040087C78B"
+            BlueprintIdentifier = "1E481E322EC400D3009F8B99"
             BuildableName = "Ethica.app"
             BlueprintName = "Ethica"
             ReferencedContainer = "container:Ethica.xcodeproj">
@@ -59,7 +61,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "1DDE12A82CD7C5040087C78B"
+            BlueprintIdentifier = "1E481E322EC400D3009F8B99"
             BuildableName = "Ethica.app"
             BlueprintName = "Ethica"
             ReferencedContainer = "container:Ethica.xcodeproj">

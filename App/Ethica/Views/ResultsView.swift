@@ -18,6 +18,7 @@ struct ResultsView: View {
     @State private var showPurchaseDecisionModal = false
     @State private var expandedSections: Set<String> = []
     @State private var showFullDetailsSheet = false
+    @State private var showSourcesSheet = false
     @State private var showComparisonView = false
     @State private var showAlternatives = false  // Collapsible alternatives section
     @State private var alternatives: [AnalysisResult.Alternative] = []
@@ -297,6 +298,10 @@ struct ResultsView: View {
             .presentationDragIndicator(.visible)
             .premiumSheet()
         }
+        .sheet(isPresented: $showSourcesSheet) {
+            SourcesReferencesView()
+                .premiumSheet()
+        }
     }
 
     // MARK: - Header Section
@@ -315,6 +320,13 @@ struct ResultsView: View {
             }
 
             Spacer()
+
+            Button(action: { showSourcesSheet = true }) {
+                Image(systemName: "info.circle")
+                    .font(.system(size: 24))
+                    .foregroundColor(Theme.textMuted)
+            }
+            .accessibilityLabel("Sources & references")
 
             ShareLink(item: shareSummary) {
                 Image(systemName: "square.and.arrow.up.circle.fill")
@@ -2072,6 +2084,7 @@ struct FullDetailsSheet: View {
     @Environment(\.dismiss) var dismiss
     @State private var expandedSections: Set<String> = ["scores", "environmental"] // Default open sections
     @State private var expandedEducationItems: Set<String> = []
+    @State private var showSourcesSheet = false
 
     private var safetyState: SafetyState {
         if !result.violations.isEmpty {
@@ -2136,12 +2149,21 @@ struct FullDetailsSheet: View {
             .navigationTitle("Product Details")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: { showSourcesSheet = true }) {
+                        Label("Sources", systemImage: "info.circle")
+                    }
+                    .foregroundColor(Theme.primary)
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") {
                         dismiss()
                     }
                     .foregroundColor(Theme.primary)
                 }
+            }
+            .sheet(isPresented: $showSourcesSheet) {
+                SourcesReferencesView()
             }
         }
     }
@@ -2258,16 +2280,19 @@ struct FullDetailsSheet: View {
 
     // MARK: - Food Grading Badges
     private var foodGradingBadgesRow: some View {
-        HStack(spacing: Spacing.sm) {
-            if let nutri = result.nutriscoreGrade {
-                foodGradeBadge(grade: nutri.uppercased(), label: "Nutri-Score", color: gradeColor(nutri))
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: Spacing.sm) {
+                if let nutri = result.nutriscoreGrade {
+                    foodGradeBadge(grade: nutri.uppercased(), label: "Nutri-Score", color: gradeColor(nutri))
+                }
+                if let eco = result.ecoscoreGrade {
+                    foodGradeBadge(grade: eco.uppercased(), label: "Eco-Score", color: gradeColor(eco))
+                }
+                if let nova = result.novaGroup {
+                    foodGradeBadge(grade: "\(nova)", label: "NOVA", color: novaColor(nova))
+                }
             }
-            if let eco = result.ecoscoreGrade {
-                foodGradeBadge(grade: eco.uppercased(), label: "Eco-Score", color: gradeColor(eco))
-            }
-            if let nova = result.novaGroup {
-                foodGradeBadge(grade: "\(nova)", label: "NOVA", color: novaColor(nova))
-            }
+            sourcesLink
         }
     }
 
@@ -3009,7 +3034,23 @@ struct FullDetailsSheet: View {
                     additivesSubSection
                 }
             }
+
+            sourcesLink
         }
+    }
+
+    // MARK: - Sources Link (shown under health/recommendation content)
+    private var sourcesLink: some View {
+        Button(action: { showSourcesSheet = true }) {
+            HStack(spacing: 4) {
+                Image(systemName: "link")
+                    .font(.system(size: 11))
+                Text("Sources & methodology")
+                    .font(.system(size: 12, weight: .medium))
+            }
+            .foregroundColor(Theme.primary)
+        }
+        .padding(.top, 2)
     }
 
     // MARK: - Additives Sub-Section
@@ -3128,9 +3169,20 @@ struct FullDetailsSheet: View {
                 Text("Source:")
                     .font(.system(size: 10))
                     .foregroundColor(Theme.textMuted)
-                Text(additive.source)
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundColor(Theme.textSecondary)
+                if let citation = CitationLibrary.lookup(additive.source) {
+                    Link(destination: citation.url) {
+                        HStack(spacing: 2) {
+                            Text(additive.source)
+                            Image(systemName: "arrow.up.right.square")
+                        }
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundColor(Theme.primary)
+                    }
+                } else {
+                    Text(additive.source)
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundColor(Theme.textSecondary)
+                }
             }
         }
         .padding(Spacing.sm)
@@ -3377,6 +3429,8 @@ struct FullDetailsSheet: View {
                     }
                 }
                 .transition(.opacity)
+
+                sourcesLink
             }
         }
     }

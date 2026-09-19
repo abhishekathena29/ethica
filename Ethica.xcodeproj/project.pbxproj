@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		02A5F6E1C327002996578CAB /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 7E00BEBBD10FAE5DED31E34D /* Lottie */; };
+		AACE000200000000000000F2 /* CitationSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = AACE000100000000000000F1 /* CitationSource.swift */; };
+		AACE000400000000000000F4 /* SourcesReferencesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AACE000300000000000000F3 /* SourcesReferencesView.swift */; };
 		1E0314862F06216B00B8B75A /* AIResultsCacheService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E0314852F06216B00B8B75A /* AIResultsCacheService.swift */; };
 		1E481E742EC41167009F8B99 /* EthicaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E481E6A2EC401F6009F8B99 /* EthicaApp.swift */; };
 		1E481E752EC4117C009F8B99 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E481E692EC401F6009F8B99 /* ContentView.swift */; };
@@ -169,6 +171,8 @@
 		1E5162E92F2870200061EA4B /* StatisticCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticCard.swift; sourceTree = "<group>"; };
 		1E5162EA2F2870200061EA4B /* StatusBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBadge.swift; sourceTree = "<group>"; };
 		1E5162F62F28719C0061EA4B /* AnalysisResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisResult.swift; sourceTree = "<group>"; };
+		AACE000100000000000000F1 /* CitationSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CitationSource.swift; sourceTree = "<group>"; };
+		AACE000300000000000000F3 /* SourcesReferencesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourcesReferencesView.swift; sourceTree = "<group>"; };
 		1E5162F82F28719C0061EA4B /* APIModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIModels.swift; sourceTree = "<group>"; };
 		1E5162F92F28719C0061EA4B /* DetectedProduct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetectedProduct.swift; sourceTree = "<group>"; };
 		1E5162FA2F28719C0061EA4B /* ScanHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanHistory.swift; sourceTree = "<group>"; };
@@ -342,6 +346,7 @@
 			isa = PBXGroup;
 			children = (
 				1E6923CB2F7DA28000388697 /* QuickSafetyResultView.swift */,
+				AACE000300000000000000F3 /* SourcesReferencesView.swift */,
 				1EFD009F2F44CE4900461A41 /* OnboardingView.swift */,
 				1EFD00992F43774500461A41 /* DisclaimerView.swift */,
 				1EFD009A2F43774500461A41 /* ReportIssueView.swift */,
@@ -449,6 +454,7 @@
 				1EFD00732F402F2B00461A41 /* TasteProfile.swift */,
 				1EFD00742F402F2B00461A41 /* UserImpact.swift */,
 				1E5162F62F28719C0061EA4B /* AnalysisResult.swift */,
+				AACE000100000000000000F1 /* CitationSource.swift */,
 				1E5162F82F28719C0061EA4B /* APIModels.swift */,
 				1E5162F92F28719C0061EA4B /* DetectedProduct.swift */,
 				1E5162FA2F28719C0061EA4B /* ScanHistory.swift */,
@@ -566,7 +572,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 2610;
-				LastUpgradeCheck = 2610;
+				LastUpgradeCheck = 2660;
 				TargetAttributes = {
 					1E481E322EC400D3009F8B99 = {
 						CreatedOnToolsVersion = 26.1.1;
@@ -686,6 +692,8 @@
 				1EFD00982F40E47800461A41 /* StoreAvailabilityBadge.swift in Sources */,
 				1E5163002F28719C0061EA4B /* UserPreferences.swift in Sources */,
 				1E5163012F28719C0061EA4B /* AnalysisResult.swift in Sources */,
+				AACE000200000000000000F2 /* CitationSource.swift in Sources */,
+				AACE000400000000000000F4 /* SourcesReferencesView.swift in Sources */,
 				1EFD00A02F44CE4900461A41 /* OnboardingView.swift in Sources */,
 				1EFD007B2F402F4500461A41 /* TasteProfileService.swift in Sources */,
 				1EFD007C2F402F4500461A41 /* ImpactService.swift in Sources */,
@@ -832,6 +840,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = H643GJUZ7R;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -855,6 +864,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_ENABLE_EXPLICIT_MODULES = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -895,6 +905,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = H643GJUZ7R;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -911,6 +922,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_ENABLE_EXPLICIT_MODULES = NO;
 			};
@@ -923,9 +935,12 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Ethica.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = D6T42397V9;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = Q48M4MZWR3;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -951,6 +966,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.ArhamJain.ethica.Ethica;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = Ethica;
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -973,9 +989,12 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Ethica.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = D6T42397V9;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = Q48M4MZWR3;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -1001,6 +1020,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.ArhamJain.ethica.Ethica;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = Ethica;
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -1022,6 +1042,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = H643GJUZ7R;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1049,6 +1070,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = H643GJUZ7R;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1075,6 +1097,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = H643GJUZ7R;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1101,6 +1124,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = H643GJUZ7R;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1187,6 +1211,8 @@
 				kind = upToNextMajorVersion;
 				minimumVersion = 2.5.1;
 			};
+			traits = (
+			);
 		};
 /* End XCRemoteSwiftPackageReference section */
 
